@@ -1,0 +1,11 @@
+运行步骤：
+	1.运行IndexAPI,插入一条数据
+	2.运行GetAPI,获取插入的数据
+	3.运行DeleteAPI,删除插入的数据
+	4.重复第1步
+	5.运行DeleteByQuery
+	6.重复第1步
+	7.运行UpdateAPI
+	8.运行MutilGetAPI
+	9.运行BulkAPI
+	10.运行BulkProcessorAPI
