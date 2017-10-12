@@ -12,7 +12,7 @@ import org.apache.rocketmq.remoting.common.RemotingHelper;
 public class AsyncProducer {
 
 	public static void main(String[] args) throws Exception {
-		DefaultMQProducer producer = new DefaultMQProducer("group1");
+		DefaultMQProducer producer = new DefaultMQProducer("simple");
 		producer.setNamesrvAddr("localhost:9876");
 		producer.start();
 		producer.setRetryTimesWhenSendAsyncFailed(0);

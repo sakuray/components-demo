@@ -22,10 +22,39 @@ rocketMQ是由阿里巴巴开发的一款消息中间件技术，之后交给apa
 	
 吐槽下rocketmq的windows脚本写的真糟糕... 而且控制台没有日志。日志文件默认在C:\Users\xxx\logs\rocketmqlogs下，可以在conf目录下配置
 
-## 简单的例子
+## 简单的消息类型及发送
+### RocketMQ的三种消息
 RocketMQ发送消息有三种：
 	
 	1. 可靠的同步发送
 	2. 可靠的异步发送
 	3. 单向传输（像UDP，存在潜在的丢消息和最大吞吐量）
 具体参见rocketmq.simple包
+
+### 顺序消息
+RocketMQ提供了有顺序FIFO的顺序消息，具体发送参见rocketmq.order
+
+### 广播消息
+广播给所有订阅了topic的消费者，如果你想要所有订阅者都接受消息：rocketmq.broadcasting
+
+### 定时消息
+定时消息只有等到指定时间才会发送消息，具体适用见：rocketmq.schedule
+
+### 批量发送
+使用批量发送是有限制的，Messageb必须要有相同的topic和waitStoreMsgOK,不支持定时
+此外，发送的消息批量一次不要超过1MB，如果你不确定消息是否超过1MB，也有办法解决，具体使用方法见:rocketmq.batch
+
+
+### 过滤接收消息
+[参考文章](https://github.com/apache/rocketmq-site/blob/master/_posts/2017-04-26-filter-messages-by-sql92-in-rocketmq.md)
+通常情况下tag是非常简单且有用的，但是一个消息只能有一个tag，在一些复杂的情景下这就有了很大的局限，此时，你可以使用SQL92来过滤出你需要的消息。
+
+**语法**
+
+	1.数值表达式  > >= < <= = BETWEEN
+	2.字符串表达式 = <> IN
+	3.IS NULL 和 IS NOT NULL
+	4.逻辑表达式 AND, OR, NOT
+	
+具体使用见rocketmq.filter
+出现：CODE: 1  DESC: The broker does not support consumer to filter message by SQL92,暂未解决，该功能没有使用成功
