@@ -1,0 +1,24 @@
+server:
+  port: 8764
+
+spring:
+  application:
+    name: consumer-test
+
+feign:
+  hystrix:
+    enabled: true
+
+hystrix:
+  metrics:
+    enabled: true
+#management:
+#  endpoint:
+#    hystrix:
+#      stream:
+#        enabled: true
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://127.0.0.1:8761/eureka/

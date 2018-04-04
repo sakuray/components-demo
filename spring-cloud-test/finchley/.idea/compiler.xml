@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="finchley-consumer" />
+        <module name="finchley-eureka" />
+        <module name="finchley-eureka-provider" />
+        <module name="finchley-gateway" />
+        <module name="finchley-service-trace" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="finchley" target="1.5" />
+      <module name="finchley-consumer" target="1.8" />
+      <module name="finchley-eureka" target="1.5" />
+      <module name="finchley-eureka-provider" target="1.8" />
+      <module name="finchley-eureka-server" target="1.8" />
+      <module name="finchley-gateway" target="1.8" />
+      <module name="finchley-service-trace" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

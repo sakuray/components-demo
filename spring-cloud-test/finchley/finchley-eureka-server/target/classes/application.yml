@@ -1,0 +1,24 @@
+server:
+  port: 8761
+
+management:
+  contextPath: admin
+
+eureka:
+  instance:
+    # 默认的监控接口info 和health会与spring boot actuator冲突
+    # statusPageUrlPath: ${management.context-path}/info
+    # healthCheckUrlPath: ${management.context-path}/health
+    # https设置
+    #nonSecurePortEnabled: false
+    #securePortEnabled: true
+    #statusPageUrl: https://${eureka.hostname}/info
+    #healthCheckUrl: https://${eureka.hostname}/health
+    #homePageUrl: https://${eureka.hostname}/
+    preferIpAddress: true
+    hostname: 127.0.0.1
+  client:
+    registerWithEureka: false
+    fetchRegistry:  false
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
