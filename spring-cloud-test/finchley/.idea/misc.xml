@@ -9,6 +9,7 @@
         <option value="$PROJECT_DIR$/finchley-consumer/pom.xml" />
         <option value="$PROJECT_DIR$/finchley-gateway/pom.xml" />
         <option value="$PROJECT_DIR$/finchley-service-trace/pom.xml" />
+        <option value="$PROJECT_DIR$/dalston-service-trace/pom.xml" />
       </list>
     </option>
   </component>

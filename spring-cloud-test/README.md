@@ -580,5 +580,143 @@
 > 前面提到过断路器的作用和雪崩效应，实际上对于微服务而言，对于调用链的追踪也是十分重要的事情。本节介绍sleuth，其为Spring cloud实现了分布式追踪解决方案。官方文档：[这里](http://cloud.spring.io/spring-cloud-static/spring-cloud-sleuth/2.0.0.M9/multi/multi_spring-cloud-sleuth.html)
 >> Span是最基础的工作单元，例如发送一个RPC请求是一个Span，Span通过一个64位的ID区分，多个Span构成一个Trace，这个就是整个请求的链路了。trace也有一个64位的ID，起始的Span(root span)的ID等于Trace的ID。
 
+>sleuth基于zipkin，分为client和server。server主要提供客户端传输数据的接口(http模式下)和展示数据的ui界面。client主要提供采集数据的采集点，和发送数据的reporter和sender。
 
+下面先介绍客户端的采集数据的方法，这里先介绍HTTP的方式，其是通过RestTemplateSender发送数据到server端，由AsyncReporter的build方法中开启的线程，以异步的方式发送。pom文件只需要引入一个jar包就行
+	
+	<dependency>
+    	<groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-zipkin</artifactId>
+    </dependency>
+
+application.yml中添加额外的参数：
+	
+	spring:
+	  sleuth:
+	    sampler:
+	      probability: 1.0
+	  zipkin:
+    	baseUrl: http://127.0.0.1:9411/
+probability的含义是样本的比例，1就是把所有的数据都发到server中，0.1就是只采集10%的数据，默认0.1。baseUrl就是zipkin的服务端地址了。默认就是http://localhost:9411/，还有些其它设置可以看ZipkinProperties类。
+
+只配置了这些如果服务端没做好是看不到数据的（没有错误抛出，也没有日志），我们可以摒弃服务端，用控制台输出数据，自己创建一个控制台输出的Reporter对象，这样就可以验证client端是否运行正常：
+
+	@Bean
+    public Reporter<Span> reporter() {
+        return Reporter.CONSOLE;
+    }
+这样访问任何接口，就能在控制台看见传输的数据了。要发送到服务端就注释掉这个Bean即可。原理是做了一个TracingFilter拦截请求和响应，生成对应的Span，请求结束finish掉Span，数据就通过Reporter和Sender发送到最终目的地了。
+
+> server端的配置也十分简单，基本上都封装好了。创建一个项目，作为zipkin的服务端。顺便一提，截止目前2018/04为止，zipkin的server端基于spring-boot 1.5.xx版本，所以不要使用spring boot 2.0。会有一系列问题。所以该服务不是finchley M9版本，而是Dalston SR5，由于该服务作为单独服务，client端使用的和server使用的zipkin版本匹配即可，spring-boot版本不同问题不大。
+
+> 首先是pom.xml配置
+
+	<parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.10.RELEASE</version>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.zipkin.java</groupId>
+            <artifactId>zipkin-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.zipkin.java</groupId>
+            <artifactId>zipkin-autoconfigure-ui</artifactId>
+        </dependency>
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Dalston.SR5</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <repositories>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/libs-milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+> 启动程序：
+
+	@SpringBootApplication
+	@EnableZipkinServer
+	public class ServiceTrace {
+	
+	    public static void main(String[] args) {
+	        new SpringApplicationBuilder(ServiceTrace.class).web(true).run(args);
+	    }
+	}
+
+> 基本配置：
+
+	server:
+	  port: 9411
+	
+	spring:
+	  application:
+	    name: trace-test
+
+> 启动服务，再访问配置了client端的web服务接口，就能在http://127.0.0.1:9411/zipkin/中看见相关的调用情况了。
+
+下面再进行扩展一下，上述的服务端采集数据都是加载在内存中，显然这不是一个好主意，还有一个问题就是其是通过http的方式传输数据的，这个也可以采取其他方式，下面介绍使用rabbitmq进行传输数据，使用elasticsearch保存数据，及查询。
+
+> client增加依赖和配置，使程序使用RabbitMQSender而不是RestTemplateSender。
+
+	<dependency>
+        <groupId>org.springframework.amqp</groupId>
+        <artifactId>spring-rabbit</artifactId>
+    </dependency>
+> 配置rabbitmq的参数，主要见RabbitProperties类。
+
+	spring:
+	  rabbitmq:
+	    host: 127.0.0.1
+	    port: 5672
+	    username: guest
+	    password: guest
+启动client端，访问接口，在rabbitmq的管理界面可以看见连接，以及该连接Publish了一条消息，但是消息并不会到达其发送的队列，因为该队列还没有生成，还需要把服务端启动起来，生成对应的队列才行。
+
+> 服务端导入rabbitmq的依赖和elasticsearch的依赖：
+
+	<dependency>
+        <groupId>io.zipkin.java</groupId>
+        <artifactId>zipkin-autoconfigure-collector-rabbitmq</artifactId>
+    	<version>2.2.2</version>
+    </dependency>
+    <dependency>
+       <groupId>io.zipkin.java</groupId>
+       <artifactId>zipkin-autoconfigure-storage-elasticsearch-http</artifactId>
+       <version>2.2.2</version>
+    </dependency>
+> 配置文件中添加：
+
+	zipkin:
+	  collector:
+	    rabbitmq:
+	      addresses: 127.0.0.1:5672
+	      username: guest
+	      password: guest
+	  storage:
+	    type: elasticsearch
+	    elasticsearch:
+	      hosts: 127.0.0.1:9300
+
+> 其他的就不需要改变了，网上看到有使用@EnableZipkinStreamServer，依赖也和我的不同，尝试了一下没有成功，那个版本的配置好像是使用了spring的stream模块，暂无研究过。
+
+> 测试方法和之前一样，访问一下client的接口，看rabbitmq队列是否有数据，再看elasticsearch中是否有数据，可以使用kibana看看，很方便。最后就是在zipkin提供的ui上查看调用情况了。和内存存储模式的不同之处在于，elasticsearch我配置完后，依赖分析那块是空的，其它功能正常。后来简单的查了下代码，好像elasticsearch的实现上就没有，只有span的，内存的依赖分析也是通过span在内存中查询得到的。所以可能就是暂时没实现，也可能是我看漏了什么。。
 # 未完待续...

@@ -2,11 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/dalston-service-trace/dalston-service-trace.iml" filepath="$PROJECT_DIR$/dalston-service-trace/dalston-service-trace.iml" />
       <module fileurl="file://$PROJECT_DIR$/finchley-consumer/finchley-consumer.iml" filepath="$PROJECT_DIR$/finchley-consumer/finchley-consumer.iml" />
       <module fileurl="file://$PROJECT_DIR$/finchley-eureka-provider/finchley-eureka-provider.iml" filepath="$PROJECT_DIR$/finchley-eureka-provider/finchley-eureka-provider.iml" />
       <module fileurl="file://$PROJECT_DIR$/finchley-eureka-server/finchley-eureka-server.iml" filepath="$PROJECT_DIR$/finchley-eureka-server/finchley-eureka-server.iml" />
       <module fileurl="file://$PROJECT_DIR$/finchley-gateway/finchley-gateway.iml" filepath="$PROJECT_DIR$/finchley-gateway/finchley-gateway.iml" />
-      <module fileurl="file://$PROJECT_DIR$/finchley-service-trace/finchley-service-trace.iml" filepath="$PROJECT_DIR$/finchley-service-trace/finchley-service-trace.iml" />
     </modules>
   </component>
 </project>

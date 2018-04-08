@@ -4,6 +4,16 @@ server:
 spring:
   application:
     name: consumer-test
+  sleuth:
+    sampler:
+      probability: 1.0
+  zipkin:
+    baseUrl: http://127.0.0.1:9411/
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
 
 feign:
   hystrix:

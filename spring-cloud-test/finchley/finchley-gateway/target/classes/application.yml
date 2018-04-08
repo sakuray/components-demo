@@ -9,6 +9,17 @@ eureka:
 spring:
   application:
     name: gateway
+  sleuth:
+    sampler:
+      probability: 1.0
+  zipkin:
+    baseUrl: http://127.0.0.1:9411/
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+
 
 zuul:
   ribbon:

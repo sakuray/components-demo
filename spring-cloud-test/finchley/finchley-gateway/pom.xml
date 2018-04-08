@@ -37,6 +37,16 @@
             <groupId>com.netflix.ribbon</groupId>
             <artifactId>ribbon-eureka</artifactId>
         </dependency>
+        <!-- sleuth -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-zipkin</artifactId>
+        </dependency>
+        <!-- rabbitmq传输sleuth数据 -->
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.amqp</groupId>-->
+            <!--<artifactId>spring-rabbit</artifactId>-->
+        <!--</dependency>-->
     </dependencies>
 
     <dependencyManagement>

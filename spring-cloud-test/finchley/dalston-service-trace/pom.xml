@@ -3,32 +3,45 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.sakuray</groupId>
-    <artifactId>finchley-service-trace</artifactId>
+    <artifactId>dalston-service-trace</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>finchley-service-trace</name>
+    <name>dalston-service-trace</name>
     <url>http://maven.apache.org</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <zipkin.version>2.6.1</zipkin.version>
     </properties>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.0.0.RELEASE</version>
+        <version>1.5.10.RELEASE</version>
     </parent>
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-zipkin</artifactId>
+            <groupId>io.zipkin.java</groupId>
+            <artifactId>zipkin-server</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.amqp</groupId>
-            <artifactId>spring-rabbit</artifactId>
+            <groupId>io.zipkin.java</groupId>
+            <artifactId>zipkin-autoconfigure-ui</artifactId>
         </dependency>
+
+        <!-- elasticsearch和rabbitmq -->
+        <!--<dependency>-->
+            <!--<groupId>io.zipkin.java</groupId>-->
+            <!--<artifactId>zipkin-autoconfigure-collector-rabbitmq</artifactId>-->
+            <!--<version>2.2.2</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>io.zipkin.java</groupId>-->
+            <!--<artifactId>zipkin-autoconfigure-storage-elasticsearch-http</artifactId>-->
+            <!--<version>2.2.2</version>-->
+        <!--</dependency>-->
     </dependencies>
 
     <dependencyManagement>
@@ -36,9 +49,9 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>Finchley.M9</version>
-                <scope>import</scope>
+                <version>Dalston.SR5</version>
                 <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -34,4 +34,9 @@ public class TestController {
     public String testRestFailNothing() {
         return restService.testFailureWithNothing();
     }
+
+    @RequestMapping(value = "sleuth")
+    public String testSleuth() {
+        return "Call Tracing Consumer";
+    }
 }
