@@ -1,6 +1,12 @@
 server:
   port: 8764
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: bus-refresh,hystrix.stream
+
 spring:
   application:
     name: consumer-test

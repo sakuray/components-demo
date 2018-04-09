@@ -95,6 +95,12 @@
             <!--<groupId>org.springframework.amqp</groupId>-->
             <!--<artifactId>spring-rabbit</artifactId>-->
         <!--</dependency>-->
+
+        <!-- spring bus -->
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.cloud</groupId>-->
+            <!--<artifactId>spring-cloud-starter-bus-amqp</artifactId>-->
+        <!--</dependency>-->
     </dependencies>
 
     <dependencyManagement>

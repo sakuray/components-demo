@@ -11,6 +11,8 @@
 	+ [2.5 断路器面板](#2.5)
 	+ [2.6 网关路由](#2.6)
 	+ [2.7 服务追踪](#2.7)
+	+ [2.8 配置中心](#2.8)
+	+ [2.9 消息总线](#2.9)
 
 ---
 <h3 id="1" href="navigate">1.基础概念</h3>
@@ -478,6 +480,14 @@
         registrationBean.setName("HystrixMetricsStreamServlet");
         return registrationBean;
     }
+**注意**：上面的问题找到了原因，在spring boot 2.0中是没有默认暴露这些endpoint的，需要手动开启，开启方法如下：
+
+	management:
+	  endpoints:
+	    web:
+	      exposure:
+	        include: bus-refresh,hystrix.stream
+最后的url变成了http://127.0.0.1:8764/actuator/hystrix.stream，上面的bean可以注释掉了。 
 > 每个消费者都有一个断路器面板，虽然有统计数据了，但是这样还是很麻烦，所以需要将系统中所有断路器的数据聚集起来。turbine这个组件可以做到，之后再补充其配置方法。
 
 <h4 id="2.6" href="navigate">2.6 网关路由</h4>
@@ -716,7 +726,140 @@ probability的含义是样本的比例，1就是把所有的数据都发到serve
 	    elasticsearch:
 	      hosts: 127.0.0.1:9300
 
-> 其他的就不需要改变了，网上看到有使用@EnableZipkinStreamServer，依赖也和我的不同，尝试了一下没有成功，那个版本的配置好像是使用了spring的stream模块，暂无研究过。
+> 其他的就不需要改变了，网上看到有使用@EnableZipkinStreamServer，依赖也和我的不同，尝试了一下没有成功，那个版本的配置好像是使用了spring的stream模块，暂未研究。
 
 > 测试方法和之前一样，访问一下client的接口，看rabbitmq队列是否有数据，再看elasticsearch中是否有数据，可以使用kibana看看，很方便。最后就是在zipkin提供的ui上查看调用情况了。和内存存储模式的不同之处在于，elasticsearch我配置完后，依赖分析那块是空的，其它功能正常。后来简单的查了下代码，好像elasticsearch的实现上就没有，只有span的，内存的依赖分析也是通过span在内存中查询得到的。所以可能就是暂时没实现，也可能是我看漏了什么。。
-# 未完待续...
+
+<h4 id="2.8" href="navigate">2.8 配置中心</h4>
+本节介绍配置中心，配置中心也是微服务中比较重要的一环。服务多起来后，配置杂乱无章，会在管理上带来很大的麻烦，配置中心就能很好的解决这个问题。配置中心自然也是分为server和client端了。下面介绍一下server端。
+> pom.xml的配置如下：
+
+	<parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.0.RELEASE</version>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-config-server</artifactId>
+        </dependency>
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-config</artifactId>
+                <version>2.0.0.M9</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <repositories>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/libs-milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+> 启动类
+
+	@SpringBootApplication
+	@EnableConfigServer
+	public class ConfigServer {
+	
+	    public static void main(String[] args) {
+	        new SpringApplicationBuilder(ConfigServer.class).web(WebApplicationType.SERVLET).run(args);
+	    }
+	}
+
+> application.yml
+	
+	server:
+	  port: 8888
+	
+	spring:
+	  profiles:
+	    active: native
+	  cloud:
+	    config:
+	      server:
+	        native:
+	          searchLocations: classpath:/config
+此处使用的是本地的文件系统，一般这个是要使用git的服务器。这里只是一个demo，所以配置了本地文件作为配置的仓库。仓库地址和上面写的一样，在classpath的config路径下面。
+> config配置仓库只放了一个文件，给之前的consumer使用的consumer-test-test.yml文件，内容如下
+
+	foo: this is first test
+启动该配置中心，访问http://127.0.0.1:8888/consumer-test/test就可以看见自己的配置了，配置仓库的格式可以有如下，我使用的就是第二种方式了：
+
+	/{application}/{profile}[/{label}]
+	/{application}-{profile}.yml
+	/{label}/{application}-{profile}.yml
+	/{application}-{profile}.properties
+	/{label}/{application}-{profile}.properties
+下面介绍一下客户端如何使用这个配置，我只放了一个consumer-test的，所以只对consumer-test进行改造。
+> pom.xml中之前就已经有config的client依赖了，这里还是提一下：
+
+	<dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-config</artifactId>
+    </dependency>
+
+> 配置文件添加profile和config server的地址，一般是要写在bootstrap.yml文件中，这里就不计较了。
+	
+	spring:
+	  cloud:
+	    config:
+	      uri: http://127.0.0.1:8888/
+	      profile: test
+
+> controller层增加一个访问接口：
+
+    @Value("${foo}")
+    private String foo;
+
+    @RequestMapping(value = "config")
+    public String testConfig() {
+        return foo;
+    }
+访问http://127.0.0.1:8764/config/ 就能看见consumer确实加载了配置中心的相关配置。
+<h4 id="2.9" href="navigate">2.9 消息总线</h4>
+本节介绍消息总线，消息总线的作用前面也介绍过，大体上就是向所有服务广播一个消息，此节主要介绍配置中心的配置发生变化后，通过消息总线广播给服务，进行配置更新。目前要实现消息总线必须使用rabbitmq或者kafka，所以要运行该例子需要启动rabbitmq(为了不影响demo，代码默认注释了改功能，需要运行自动取消注释)
+
+> 消息总线是针对config client设计的，对一个client进行刷新配置操作，作用于所有的client。所以我们需要启动两个consumer,启动一个后，修改ip，启动第二个来进行测试。pom.xml的新增依赖如下：
+
+	<dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-bus-amqp</artifactId>
+    </dependency>
+> 配置文件中添加rabbitmq的配置，这个在之前的链路追踪节中已经添加过了，这里再说一遍
+
+	management:
+  	  endpoints:
+        web:
+          exposure:
+            include: bus-refresh
+	spring:
+	  rabbitmq:
+	    host: 127.0.0.1
+	    port: 5672
+	    username: guest
+	    password: guest
+还有一个改动就是将spring.cloud.config.uri等配置放在了bootstrap.yml中，提高其优先级。
+**注意**：spring boot 2.0后将endpoint的管理都放在了actuator中，要开启对应的endpoint才行，include不能直接在yml中使用*通配。在properties中可以这么操作。
+
+> 在注入变量的类上加上注解@RefreshScope，我放在了TestController中，所以这个类上有该注解
+
+运行程序consumer，换个端口再运行程序consumer。我这用了8764和8765两个接口，访问http://127.0.0.1:8764/config/和http://127.0.0.1:8765/config/，可以看见config server中的foo配置的this is first test。
+
+
+ 
+修改配置的文件，这里要注意修改的运行中的，不是代码里面的。比如idea运行的话要修改target目录下的对应配置文件，修改consumer-test-test.yml的内容foo为：this is second test。POST方式访问http://127.0.0.1:8764/actuator/bus-refresh/，再访问上面两个url，可以发现两个的foo配置都发生了改变。

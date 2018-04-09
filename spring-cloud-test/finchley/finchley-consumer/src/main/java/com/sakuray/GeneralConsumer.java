@@ -29,15 +29,15 @@ public class GeneralConsumer {
         return new RestTemplate();
     }
 
-    @Bean
-    public ServletRegistrationBean servletRegistrationBean() {
-        HystrixMetricsStreamServlet streamServlet = new HystrixMetricsStreamServlet();
-        ServletRegistrationBean registrationBean = new ServletRegistrationBean(streamServlet);
-        registrationBean.setLoadOnStartup(1);
-        registrationBean.addUrlMappings("/hystrix.stream");
-        registrationBean.setName("HystrixMetricsStreamServlet");
-        return registrationBean;
-    }
+//    @Bean
+//    public ServletRegistrationBean servletRegistrationBean() {
+//        HystrixMetricsStreamServlet streamServlet = new HystrixMetricsStreamServlet();
+//        ServletRegistrationBean registrationBean = new ServletRegistrationBean(streamServlet);
+//        registrationBean.setLoadOnStartup(1);
+//        registrationBean.addUrlMappings("/hystrix.stream");
+//        registrationBean.setName("HystrixMetricsStreamServlet");
+//        return registrationBean;
+//    }
 
 //    @Bean
 //    public Reporter<Span> reporter() {
