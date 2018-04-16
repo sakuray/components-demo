@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 //@RefreshScope
 public class TestController {
@@ -50,4 +52,14 @@ public class TestController {
 //    public String testConfig() {
 //        return foo;
 //    }
+
+    @RequestMapping(value = "login")
+    public String testLogin() {
+        return UUID.randomUUID().toString();
+    }
+
+    @RequestMapping(value = "security")
+    public String testSecurity() {
+        return "only login success can through zuul arrive here. congratulation!!!";
+    }
 }
