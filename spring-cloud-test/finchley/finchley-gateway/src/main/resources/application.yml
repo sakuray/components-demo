@@ -9,6 +9,12 @@ eureka:
 spring:
   application:
     name: gateway
+  zipkin:
+    baseUrl: http://127.0.0.1:9411/
+  sleuth:
+    enabled: true
+    sampler:
+      probability: 1
 
 zuul:
   ribbon:

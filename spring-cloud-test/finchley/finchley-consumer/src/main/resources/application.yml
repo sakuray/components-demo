@@ -4,6 +4,12 @@ server:
 spring:
   application:
     name: consumer-test
+  zipkin:
+    baseUrl: http://127.0.0.1:9411/
+  sleuth:
+    enabled: true
+    sampler:
+      probability: 1
 
 feign:
   hystrix:

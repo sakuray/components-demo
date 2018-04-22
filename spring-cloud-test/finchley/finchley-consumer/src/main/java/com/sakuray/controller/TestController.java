@@ -34,4 +34,9 @@ public class TestController {
     public String testRestFailNothing() {
         return restService.testFailureWithNothing();
     }
+
+    @RequestMapping(value = "nothing")
+    public String testSleuth() {
+        return "do nothing!!!";
+    }
 }
