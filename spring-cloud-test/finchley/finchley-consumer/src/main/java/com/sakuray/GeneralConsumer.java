@@ -12,6 +12,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import zipkin2.Span;
+import zipkin2.reporter.Reporter;
+import zipkin2.reporter.Sender;
 
 @SpringBootApplication
 @RestController
@@ -26,15 +29,20 @@ public class GeneralConsumer {
         return new RestTemplate();
     }
 
-    @Bean
-    public ServletRegistrationBean servletRegistrationBean() {
-        HystrixMetricsStreamServlet streamServlet = new HystrixMetricsStreamServlet();
-        ServletRegistrationBean registrationBean = new ServletRegistrationBean(streamServlet);
-        registrationBean.setLoadOnStartup(1);
-        registrationBean.addUrlMappings("/hystrix.stream");
-        registrationBean.setName("HystrixMetricsStreamServlet");
-        return registrationBean;
-    }
+//    @Bean
+//    public ServletRegistrationBean servletRegistrationBean() {
+//        HystrixMetricsStreamServlet streamServlet = new HystrixMetricsStreamServlet();
+//        ServletRegistrationBean registrationBean = new ServletRegistrationBean(streamServlet);
+//        registrationBean.setLoadOnStartup(1);
+//        registrationBean.addUrlMappings("/hystrix.stream");
+//        registrationBean.setName("HystrixMetricsStreamServlet");
+//        return registrationBean;
+//    }
+
+//    @Bean
+//    public Reporter<Span> reporter() {
+//        return Reporter.CONSOLE;
+//    }
 
     public static void main(String[] args) {
         new SpringApplicationBuilder(GeneralConsumer.class).web(WebApplicationType.SERVLET).run(args);

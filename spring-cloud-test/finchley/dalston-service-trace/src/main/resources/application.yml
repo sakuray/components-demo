@@ -1,0 +1,17 @@
+server:
+  port: 9411
+
+spring:
+  application:
+    name: trace-test
+
+#zipkin:
+#  collector:
+#    rabbitmq:
+#      addresses: 127.0.0.1:5672
+#      username: guest
+#      password: guest
+#  storage:
+#    type: elasticsearch
+#    elasticsearch:
+#      hosts: 127.0.0.1:9300   # 其它配置见类 ZipkinElasticsearchHttpStorageProperties
