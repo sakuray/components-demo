@@ -1,0 +1,13 @@
+$(function(){
+	$('#processTab').propertygrid({
+		fit:true,
+		fitColumn:true,
+		singleSelect:true,
+		rownumbers:true,
+		showGroup:true,
+		groupField:group,
+		columns:[[
+		          {},
+		]],
+	});
+});
