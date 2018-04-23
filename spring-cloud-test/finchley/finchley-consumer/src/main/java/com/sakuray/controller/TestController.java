@@ -40,6 +40,11 @@ public class TestController {
         return restService.testFailureWithNothing();
     }
 
+<<<<<<< HEAD
+    @RequestMapping(value = "nothing")
+    public String testSleuth() {
+        return "do nothing!!!";
+=======
     @RequestMapping(value = "sleuth")
     public String testSleuth() {
         return "Call Tracing Consumer";
@@ -61,5 +66,6 @@ public class TestController {
     @RequestMapping(value = "security")
     public String testSecurity() {
         return "only login success can through zuul arrive here. congratulation!!!";
+>>>>>>> 6ee02b5cf3e426e48a828c84ba0da9c625477c96
     }
 }

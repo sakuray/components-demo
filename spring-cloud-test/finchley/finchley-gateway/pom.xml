@@ -37,11 +37,14 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-zipkin</artifactId>
         </dependency>
+<<<<<<< HEAD
+=======
         <!-- rabbitmq传输sleuth数据 -->
         <!--<dependency>-->
             <!--<groupId>org.springframework.amqp</groupId>-->
             <!--<artifactId>spring-rabbit</artifactId>-->
         <!--</dependency>-->
+>>>>>>> 6ee02b5cf3e426e48a828c84ba0da9c625477c96
     </dependencies>
 
     <build>
