@@ -1,4 +1,4 @@
-package com.sakuray;
+package com.sakuray.netty;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;

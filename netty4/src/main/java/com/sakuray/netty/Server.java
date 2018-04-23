@@ -1,4 +1,4 @@
-package com.sakuray;
+package com.sakuray.netty;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
